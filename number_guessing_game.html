@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 550px;
+            padding: 35px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.4rem;
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .game-info {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid #2575fc;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+        
+        .difficulty-selector {
+            margin: 25px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .difficulty-btn {
+            background-color: #e9ecef;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .difficulty-btn:hover {
+            background-color: #dee2e6;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .difficulty-btn.active {
+            background-color: #2575fc;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.3);
+        }
+        
+        .difficulty-icon {
+            font-size: 1.2rem;
+        }
+        
+        .game-area {
+            display: none;
+            margin-top: 25px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .range-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2575fc;
+            background-color: #f0f5ff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .attempts-display {
+            font-weight: 700;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .attempts-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .attempts-progress {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .input-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #2575fc;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2);
+        }
+        
+        button {
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 24px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #1b65d8;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(-1px);
+        }
+        
+        button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .feedback {
+            margin: 20px 0;
+            padding: 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            animation: pulse 1s;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hint {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .guesses-container {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .guesses-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .guesses-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            min-height: 40px;
+        }
+        
+        .guess-item {
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .guess-item.correct-guess {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .guess-item.high-guess {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .guess-item.low-guess {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .game-history {
+            display: none;
+            margin-top: 30px;
+            text-align: left;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .history-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+            color: #333;
+        }
+        
+        .history-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 5px solid #2575fc;
+            transition: transform 0.2s;
+        }
+        
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .history-item.won {
+            border-left-color: #4CAF50;
+        }
+        
+        .history-item.lost {
+            border-left-color: #f44336;
+        }
+        
+        .attempts-left {
+            font-weight: 600;
+            color: #2575fc;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        .hint-button {
+            background-color: #6a11cb;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2575fc;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .game-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Number Guessing Game</h1>
+        
+        <div class="game-info">
+            <p>Try to guess the secret number! Select a difficulty to begin. Use hints if you're stuck!</p>
+        </div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn" data-difficulty="easy">
+                <span class="difficulty-icon">😊</span> Easy (1-10, 7 attempts)
+            </button>
+            <button class="difficulty-btn" data-difficulty="medium">
+                <span class="difficulty-icon">😐</span> Medium (1-15, 5 attempts)
+            </button>
+            <button class="difficulty-btn" data-difficulty="hard">
+                <span class="difficulty-icon">😎</span> Hard (1-20, 3 attempts)
+            </button>
+        </div>
+        
+        <div class="game-area">
+            <div class="range-display" id="range-display">Range: 1-10</div>
+            
+            <div class="attempts-display">
+                <span>Attempts left:</span>
+                <span id="attempts-count">7</span>
+            </div>
+            
+            <div class="attempts-bar">
+                <div class="attempts-progress" id="attempts-progress"></div>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="games-played">0</div>
+                    <div class="stat-label">Games Played</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="games-won">0</div>
+                    <div class="stat-label">Games Won</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="win-rate">0%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="number" id="guess-input" min="1" max="20" placeholder="Enter your guess" autocomplete="off">
+            </div>
+            
+            <div class="buttons-container">
+                <button id="submit-guess">
+                    <span>✅</span> Submit Guess
+                </button>
+                <button id="hint-button" class="hint-button">
+                    <span>💡</span> Get Hint
+                </button>
+                <button id="show-history">
+                    <span>📊</span> View History
+                </button>
+            </div>
+            
+            <div class="feedback" id="feedback">
+                Select a difficulty and start guessing!
+            </div>
+            
+            <div class="guesses-container">
+                <div class="guesses-title">Your Guesses:</div>
+                <div class="guesses-list" id="guesses-list"></div>
+            </div>
+            
+            <div class="buttons-container">
+                <button id="play-again" style="display: none;">
+                    <span>🔄</span> Play Again
+                </button>
+                <button id="change-difficulty" style="display: none;">
+                    <span>⚙️</span> Change Difficulty
+                </button>
+            </div>
+        </div>
+        
+        <div class="game-history" id="game-history">
+            <h2 class="history-header">📋 Game History</h2>
+            <div id="history-list"></div>
+            <button id="new-game">
+                <span>🎮</span> New Game
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>Created by Guvvala Venkata Narayana</p>
+            <p>Try to beat your high score!</p>
+        </div>
+    </div>
+
+    <script>
+        // Game state with enhanced properties
+        let gameState = {
+            difficulty: '',
+            maxRange: 0,
+            maxAttempts: 0,
+            attemptsLeft: 0,
+            targetNumber: 0,
+            guesses: [],
+            gameHistory: [],
+            gamesPlayed: 0,
+            gamesWon: 0,
+            hintsUsed: 0
+        };
+
+        // DOM elements
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const gameArea = document.querySelector('.game-area');
+        const rangeDisplay = document.getElementById('range-display');
+        const attemptsCount = document.getElementById('attempts-count');
+        const attemptsProgress = document.getElementById('attempts-progress');
+        const guessInput = document.getElementById('guess-input');
+        const submitGuess = document.getElementById('submit-guess');
+        const hintButton = document.getElementById('hint-button');
+        const feedback = document.getElementById('feedback');
+        const guessesList = document.getElementById('guesses-list');
+        const playAgainButton = document.getElementById('play-again');
+        const changeDifficultyButton = document.getElementById('change-difficulty');
+        const showHistoryButton = document.getElementById('show-history');
+        const gameHistory = document.getElementById('game-history');
+        const historyList = document.getElementById('history-list');
+        const newGameButton = document.getElementById('new-game');
+        const gamesPlayedElement = document.getElementById('games-played');
+        const gamesWonElement = document.getElementById('games-won');
+        const winRateElement = document.getElementById('win-rate');
+
+        // Event listeners
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const difficulty = button.getAttribute('data-difficulty');
+                selectDifficulty(difficulty, event);
+            });
+        });
+
+        submitGuess.addEventListener('click', processGuess);
+        hintButton.addEventListener('click', provideHint);
+        showHistoryButton.addEventListener('click', showGameHistory);
+        
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                processGuess();
+            }
+        });
+        
+        guessInput.addEventListener('input', () => {
+            // Validate input as user types
+            const value = parseInt(guessInput.value);
+            if (value < 1) guessInput.value = 1;
+            if (value > gameState.maxRange) guessInput.value = gameState.maxRange;
+        });
+
+        playAgainButton.addEventListener('click', resetGame);
+        changeDifficultyButton.addEventListener('click', () => {
+            gameArea.style.display = 'none';
+            document.querySelector('.difficulty-selector').style.display = 'flex';
+            feedback.textContent = 'Select a difficulty to begin!';
+            feedback.className = 'feedback';
+        });
+        
+        newGameButton.addEventListener('click', () => {
+            gameHistory.style.display = 'none';
+            document.querySelector('.difficulty-selector').style.display = 'flex';
+            gameArea.style.display = 'none';
+            feedback.textContent = 'Select a difficulty to begin!';
+            feedback.className = 'feedback';
+        });
+
+        // Game functions
+        function selectDifficulty(difficulty, event) {
+            // Update active button
+            difficultyButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Set game parameters based on difficulty
+            if (difficulty === 'easy') {
+                gameState.maxRange = 10;
+                gameState.maxAttempts = 7;
+            } else if (difficulty === 'medium') {
+                gameState.maxRange = 15;
+                gameState.maxAttempts = 5;
+            } else {
+                gameState.maxRange = 20;
+                gameState.maxAttempts = 3;
+            }
+            
+            gameState.difficulty = difficulty;
+            gameState.attemptsLeft = gameState.maxAttempts;
+            gameState.targetNumber = Math.floor(Math.random() * gameState.maxRange) + 1;
+            gameState.guesses = [];
+            gameState.hintsUsed = 0;
+            
+            // Update UI
+            rangeDisplay.textContent = `Range: 1-${gameState.maxRange}`;
+            attemptsCount.textContent = gameState.attemptsLeft;
+            updateAttemptsBar();
+            gameArea.style.display = 'block';
+            document.querySelector('.difficulty-selector').style.display = 'none';
+            guessInput.min = 1;
+            guessInput.max = gameState.maxRange;
+            guessInput.placeholder = `Enter a number between 1 and ${gameState.maxRange}`;
+            guessInput.focus();
+            
+            // Clear previous feedback and guesses
+            feedback.textContent = `I'm thinking of a number between 1 and ${gameState.maxRange}. Can you guess it?`;
+            feedback.className = 'feedback hint';
+            guessesList.innerHTML = '';
+            
+            // Enable buttons
+            submitGuess.disabled = false;
+            hintButton.disabled = false;
+            playAgainButton.style.display = 'none';
+            changeDifficultyButton.style.display = 'none';
+            
+            updateStats();
+        }
+
+        function processGuess() {
+            const guess = parseInt(guessInput.value);
+            
+            // Validate input
+            if (isNaN(guess)) {
+                feedback.textContent = 'Please enter a valid number';
+                feedback.className = 'feedback incorrect';
+                guessInput.focus();
+                return;
+            }
+            
+            if (guess < 1 || guess > gameState.maxRange) {
+                feedback.textContent = `Please enter a number between 1 and ${gameState.maxRange}`;
+                feedback.className = 'feedback incorrect';
+                guessInput.focus();
+                return;
+            }
+            
+            // Check if guess was already made
+            if (gameState.guesses.includes(guess)) {
+                feedback.textContent = `You already guessed ${guess}. Try a different number.`;
+                feedback.className = 'feedback incorrect';
+                guessInput.value = '';
+                guessInput.focus();
+                return;
+            }
+            
+            // Process the guess
+            gameState.guesses.push(guess);
+            gameState.attemptsLeft--;
+            attemptsCount.textContent = gameState.attemptsLeft;
+            updateAttemptsBar();
+            
+            // Add guess to the list
+            addGuessToList(guess);
+            
+            // Check if guess is correct
+            if (guess === gameState.targetNumber) {
+                feedback.innerHTML = `🎉 <strong>Correct!</strong> You guessed it in ${gameState.guesses.length} attempt${gameState.guesses.length === 1 ? '' : 's'}.`;
+                feedback.className = 'feedback correct';
+                gameState.gamesWon++;
+                endGame(true);
+                return;
+            }
+            
+            // Provide hint
+            let hintText = '';
+            let difference = Math.abs(guess - gameState.targetNumber);
+            
+            if (guess > gameState.targetNumber) {
+                hintText = 'Too high!';
+                if (difference <= 3) hintText += ' But very close!';
+            } else {
+                hintText = 'Too low!';
+                if (difference <= 3) hintText += ' But very close!';
+            }
+            
+            feedback.textContent = hintText;
+            feedback.className = 'feedback hint';
+            
+            // Check if game is over
+            if (gameState.attemptsLeft === 0) {
+                feedback.innerHTML = `💔 <strong>Game over!</strong> The number was ${gameState.targetNumber}.`;
+                feedback.className = 'feedback incorrect';
+                endGame(false);
+            }
+            
+            // Clear input for next guess
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function addGuessToList(guess) {
+            const guessItem = document.createElement('div');
+            guessItem.className = 'guess-item';
+            guessItem.textContent = guess;
+            
+            if (guess === gameState.targetNumber) {
+                guessItem.classList.add('correct-guess');
+            } else if (guess > gameState.targetNumber) {
+                guessItem.classList.add('high-guess');
+            } else {
+                guessItem.classList.add('low-guess');
+            }
+            
+            guessesList.appendChild(guessItem);
+            
+            // Scroll to see the latest guess
+            guessItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function provideHint() {
+            if (gameState.hintsUsed >= 2) {
+                feedback.textContent = 'You have used all available hints!';
+                feedback.className = 'feedback incorrect';
+                return;
+            }
+            
+            gameState.hintsUsed++;
+            
+            // Provide different types of hints
+            let hint;
+            if (gameState.hintsUsed === 1) {
+                // Hint about even/odd
+                hint = `Hint: The number is ${gameState.targetNumber % 2 === 0 ? 'even' : 'odd'}.`;
+            } else {
+                // Hint about range
+                let rangeHint;
+                if (gameState.targetNumber <= gameState.maxRange / 3) {
+                    rangeHint = 'in the lower third';
+                } else if (gameState.targetNumber <= 2 * gameState.maxRange / 3) {
+                    rangeHint = 'in the middle third';
+                } else {
+                    rangeHint = 'in the upper third';
+                }
+                hint = `Hint: The number is ${rangeHint} of the range.`;
+            }
+            
+            feedback.textContent = hint;
+            feedback.className = 'feedback hint';
+            
+            // Disable hint button if all hints used
+            if (gameState.hintsUsed >= 2) {
+                hintButton.disabled = true;
+                hintButton.innerHTML = '<span>💡</span> No Hints Left';
+            }
+        }
+
+        function endGame(isWin) {
+            // Disable input and buttons
+            guessInput.disabled = true;
+            submitGuess.disabled = true;
+            hintButton.disabled = true;
+            
+            // Show appropriate buttons
+            playAgainButton.style.display = 'inline-flex';
+            changeDifficultyButton.style.display = 'inline-flex';
+            
+            // Add to game history
+            gameState.gameHistory.push({
+                target: gameState.targetNumber,
+                guesses: [...gameState.guesses],
+                won: isWin,
+                difficulty: gameState.difficulty,
+                attempts: gameState.maxAttempts - gameState.attemptsLeft,
+                hintsUsed: gameState.hintsUsed,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            gameState.gamesPlayed++;
+            updateStats();
+            
+            // Save stats to localStorage
+            saveStatsToLocalStorage();
+        }
+
+        function resetGame() {
+            // Generate new target number
+            gameState.targetNumber = Math.floor(Math.random() * gameState.maxRange) + 1;
+            gameState.attemptsLeft = gameState.maxAttempts;
+            gameState.guesses = [];
+            gameState.hintsUsed = 0;
+            
+            // Reset UI
+            attemptsCount.textContent = gameState.attemptsLeft;
+            updateAttemptsBar();
+            guessInput.value = '';
+            guessInput.disabled = false;
+            submitGuess.disabled = false;
+            hintButton.disabled = false;
+            hintButton.innerHTML = '<span>💡</span> Get Hint';
+            feedback.textContent = `New game! I'm thinking of a number between 1 and ${gameState.maxRange}.`;
+            feedback.className = 'feedback hint';
+            guessesList.innerHTML = '';
+            playAgainButton.style.display = 'none';
+            changeDifficultyButton.style.display = 'none';
+            
+            guessInput.focus();
+        }
+
+        function updateAttemptsBar() {
+            const percentage = (gameState.attemptsLeft / gameState.maxAttempts) * 100;
+            attemptsProgress.style.width = `${percentage}%`;
+            
+            // Change color based on attempts left
+            if (percentage > 50) {
+                attemptsProgress.style.background = 'linear-gradient(to right, #4CAF50, #8BC34A)';
+            } else if (percentage > 25) {
+                attemptsProgress.style.background = 'linear-gradient(to right, #FF9800, #FFC107)';
+            } else {
+                attemptsProgress.style.background = 'linear-gradient(to right, #F44336, #EF5350)';
+            }
+        }
+
+        function showGameHistory() {
+            // Hide game area
+            gameArea.style.display = 'none';
+            
+            // Show game history
+            gameHistory.style.display = 'block';
+            
+            // Clear previous history
+            historyList.innerHTML = '';
+            
+            // Add each game to history
+            if (gameState.gameHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; padding: 20px;">No game history available. Play some games first!</p>';
+                return;
+            }
+            
+            // Show history in reverse order (newest first)
+            [...gameState.gameHistory].reverse().forEach((game, index) => {
+                const gameItem = document.createElement('div');
+                gameItem.className = `history-item ${game.won ? 'won' : 'lost'}`;
+                
+                const resultText = game.won ? '🏆 Won' : '💔 Lost';
+                const guessText = game.guesses.map(g => {
+                    if (g === game.target) return `<strong>${g}</strong>`;
+                    return g;
+                }).join(', ');
+                
+                gameItem.innerHTML = `
+                    <strong>Game ${gameState.gameHistory.length - index} (${game.difficulty}) - ${resultText}</strong><br>
+                    <small>${game.timestamp}</small><br>
+                    Target: <strong>${game.target}</strong> | 
+                    Attempts: ${game.attempts}/${gameState.maxAttempts} | 
+                    Hints: ${game.hintsUsed}<br>
+                    Guesses: ${guessText}
+                `;
+                
+                historyList.appendChild(gameItem);
+            });
+        }
+
+        function updateStats() {
+            gamesPlayedElement.textContent = gameState.gamesPlayed;
+            gamesWonElement.textContent = gameState.gamesWon;
+            
+            const winRate = gameState.gamesPlayed > 0 
+                ? Math.round((gameState.gamesWon / gameState.gamesPlayed) * 100) 
+                : 0;
+            winRateElement.textContent = `${winRate}%`;
+            
+            // Update win rate color based on percentage
+            if (winRate >= 70) {
+                winRateElement.style.color = '#4CAF50';
+            } else if (winRate >= 40) {
+                winRateElement.style.color = '#FF9800';
+            } else {
+                winRateElement.style.color = '#F44336';
+            }
+        }
+
+        function saveStatsToLocalStorage() {
+            const stats = {
+                gamesPlayed: gameState.gamesPlayed,
+                gamesWon: gameState.gamesWon,
+                gameHistory: gameState.gameHistory.slice(-10) // Keep only last 10 games
+            };
+            localStorage.setItem('numberGuessingGameStats', JSON.stringify(stats));
+        }
+
+        function loadStatsFromLocalStorage() {
+            const savedStats = localStorage.getItem('numberGuessingGameStats');
+            if (savedStats) {
+                const stats = JSON.parse(savedStats);
+                gameState.gamesPlayed = stats.gamesPlayed || 0;
+                gameState.gamesWon = stats.gamesWon || 0;
+                gameState.gameHistory = stats.gameHistory || [];
+                updateStats();
+            }
+        }
+
+        // Initialize the game
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStatsFromLocalStorage();
+            feedback.textContent = 'Select a difficulty to begin!';
+            feedback.className = 'feedback';
+        });
+    </script>
+</body>
+</html>

@@ -1,63 +1,103 @@
-def calculate_balance(transactions):
-    balance = 0
+balance = 0 
+transactions = []
 
-    for transaction in transactions:
-        if transaction["type"] == "deposit":
-            balance += transaction["amount"]
-        elif transaction["type"] == "withdraw":
-            balance -= transaction["amount"]
+def print_menu():
+    print("\n---Personal Finance Tracker ---")
+    print("1. Deposit")
+    print("2. Withdraw")
+    print("3. Check Balance")
+    print("4. Transaction History")
+    print("5. Exit")
 
-    return balance
-
-def add_transaction(transactions):
-    transaction_type = input("Enter transaction type (deposit/withdraw): ").lower()
-    amount = float(input("Enter amount: "))
+def deposit(balance, transactions):
+    amount = float(input("Enter deposit amount: "))
     reason = input("Enter reason: ")
 
-    if transaction_type == "withdraw":
-        balance = calculate_balance(transactions)
-        if amount > balance:
-            print("Insufficient balance. Transaction cancelled.")
-            return
-        
+    balance += amount
+
     transaction = {
-        "type": transaction_type,
-        "amount": amount,
+        "type": "deposit", 
+        "amount": amount, 
         "reason": reason
     }
 
     transactions.append(transaction)
-    print("Transaction added successfully.")
+
+    print("Deposit successful.")
+    return balance
 
 
-def view_transactions(transactions):
-    if not transactions:
-        print("No transactions available.")
-        return
+def withdraw(balance, transactions):
+    amount = float(input("Enter withdrawal amount: "))
+
+    if amount > balance:
+        print("Insufficient balance. Withdrawal denied.")
+        return balance
     
-    for i, transaction in enumerate(transactions, start=1):
-        print(f"{i}.{transaction['type']} | {transaction['amount']} | {transaction['reason']}")
+    reason = input("Enter reason: ")
 
+    balance -= amount
 
-transactions = []
+    transaction = {
+        "type": "withdraw", 
+        "amount": amount, 
+        "reason": reason
+    }
+
+    transactions.append(transaction)
+
+    print("Withdrawal successful.")
+    return balance
+
+def show_balance(balance):
+    print(f"Current Balance: ₹{balance}")
+
+def show_transactions(transactions):
+    if not transactions:
+        print("No transactions found.")
+        return 
+    
+    for i, t in enumerate(transactions, start=1):
+        print(f"{i}. {t['type']} | ₹{t['amount']} | {t['reason']}")
 
 while True:
-    print("\n1. Add Transaction")
-    print("2. View Transactions")
-    print("3. Check Balance")
-    print("4. Exit")
-
-    choice = input("Enter your choice: ")
+    print_menu()
+    choice = input("Choose an option (1-5): ")
 
     if choice == "1":
-        add_transaction(transactions)
+        balance = deposit(balance, transactions)
+
     elif choice == "2":
-        view_transactions(transactions)
+        balance = withdraw(balance, transactions)
+    
     elif choice == "3":
-        balance = calculate_balance(transactions)
-        print("Current Balance:", balance)
+        show_balance(balance)
+
     elif choice == "4":
-        print("Exiting program.")
+        show_transactions(transactions)
+
+    elif choice == "5":
+        print("Exiting .. Thank you!")
         break
+
     else:
-        print("Invalid choice. Try again.")
+        print("Ivalid choice. Try again.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
