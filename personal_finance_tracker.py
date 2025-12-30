@@ -1,103 +1,59 @@
-balance = 0 
-transactions = []
+"""
 
-def print_menu():
-    print("\n---Personal Finance Tracker ---")
-    print("1. Deposit")
-    print("2. Withdraw")
-    print("3. Check Balance")
-    print("4. Transaction History")
-    print("5. Exit")
+1. Project name: personal finance tracker
+2. Version: 2nd version 
+3. Purpose : to improve the core logic and to be ensure code with better error hadling and with clear comments to explain and to be ensure code to helps for future file handling
 
-def deposit(balance, transactions):
-    amount = float(input("Enter deposit amount: "))
-    reason = input("Enter reason: ")
+"""
+balance = 0
+transactions = [] 
 
-    balance += amount
+def get_valid_amount(): # to ensure to getting valid input of amount from user 
+    while True:    
+        try:
+            amount = float(input("Enter amount: "))
 
+            if amount <= 0: # to ensure to enter the amount correctly
+                print("Amount must be greater than zero.")
+                continue #skip the remaining code and starts from starting of the loop 
+            
+            return amount
+        
+        except ValueError: # print below statement if the user enters incorrect formated input and then runs the while loop from start
+            print("Invalid input. Please enter a numeric value.")
+
+def create_transaction(transaction_type):
+    """
+    Creates a single transaction dictionary and updates balanec.
+    transaction_type: 'deposit' or 'withdraw'
+
+    """
+
+    global balance # we are modifying global balance
+
+    amount = get_valid_amount() # validated amount input
+    reason = input("Enter reason for transaction: ")
+
+    # logic for deposit
+    if transaction_type == "deposit":
+        balance += amount
+
+    # logic for withdrawal
+    elif transaction_type == "withdraw":
+        if amount > balance:
+            print("Insufficient balance. Transaction cancelled.")
+            return # stop function, no transaction created
+        balance -= amount
+
+    # transaction dictionary
     transaction = {
-        "type": "deposit", 
+        "type": transaction_type,
         "amount": amount, 
-        "reason": reason
-    }
+        "reason": reason, 
+        "balance_after": balance
+    }    
 
+    # store transaction
     transactions.append(transaction)
-
-    print("Deposit successful.")
-    return balance
-
-
-def withdraw(balance, transactions):
-    amount = float(input("Enter withdrawal amount: "))
-
-    if amount > balance:
-        print("Insufficient balance. Withdrawal denied.")
-        return balance
     
-    reason = input("Enter reason: ")
-
-    balance -= amount
-
-    transaction = {
-        "type": "withdraw", 
-        "amount": amount, 
-        "reason": reason
-    }
-
-    transactions.append(transaction)
-
-    print("Withdrawal successful.")
-    return balance
-
-def show_balance(balance):
-    print(f"Current Balance: ₹{balance}")
-
-def show_transactions(transactions):
-    if not transactions:
-        print("No transactions found.")
-        return 
-    
-    for i, t in enumerate(transactions, start=1):
-        print(f"{i}. {t['type']} | ₹{t['amount']} | {t['reason']}")
-
-while True:
-    print_menu()
-    choice = input("Choose an option (1-5): ")
-
-    if choice == "1":
-        balance = deposit(balance, transactions)
-
-    elif choice == "2":
-        balance = withdraw(balance, transactions)
-    
-    elif choice == "3":
-        show_balance(balance)
-
-    elif choice == "4":
-        show_transactions(transactions)
-
-    elif choice == "5":
-        print("Exiting .. Thank you!")
-        break
-
-    else:
-        print("Ivalid choice. Try again.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print("Transactoin added successfully.")
