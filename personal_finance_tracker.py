@@ -22,29 +22,12 @@ def get_valid_amount(): # to ensure to getting valid input of amount from user
         except ValueError: # print below statement if the user enters incorrect formated input and then runs the while loop from start
             print("Invalid input. Please enter a numeric value.")
 
-def create_transaction(transaction_type):
+def create_transaction(transaction_type, amount, reason, balance):
     """
     Creates a single transaction dictionary and updates balanec.
     transaction_type: 'deposit' or 'withdraw'
 
     """
-
-    global balance # we are modifying global balance
-
-    amount = get_valid_amount() # validated amount input
-    reason = input("Enter reason for transaction: ")
-
-    # logic for deposit
-    if transaction_type == "deposit":
-        balance += amount
-
-    # logic for withdrawal
-    elif transaction_type == "withdraw":
-        if amount > balance:
-            print("Insufficient balance. Transaction cancelled.")
-            return # stop function, no transaction created
-        balance -= amount
-
     # transaction dictionary
     transaction = {
         "type": transaction_type,
@@ -56,4 +39,120 @@ def create_transaction(transaction_type):
     # store transaction
     transactions.append(transaction)
     
-    print("Transactoin added successfully.")
+    print("Transaction added successfully.")
+
+
+def show_transactions():
+    """
+    Displays all transactions in a readable format.
+    """
+    if not transactions:
+        print("No transactions found.")
+        return 
+    
+    print("\n----- TRANSACTION HISTORY -----")
+
+    for index, transaction in enumerate(transactions, start=1):
+        print(f"\nTransaction {index}")
+        print(f"Type    : {transaction['type']}")
+        print(f"Amount  : ₹{transaction['amount']}")
+        print(f"Reason  : {transaction['reason']}")
+        print(f"Balance : ₹{transaction['balance_after']:.2f}")
+        
+    print("\n-------------------------------")
+
+def show_balance():
+    """
+    Displays the current available balance.
+    """
+    print("\n----- CURRENT BALANCE -----")
+    print(f"Available Balance: ₹{balance:.2f}")
+    print("\n---------------------------")
+
+def show_menu():
+    """
+    Displays the main menu options.
+    """
+    print("\n====== PERSONAL FINANCE TRACKER ======")
+    print("1. Deposit Money")
+    print("2. Withdraw Money")
+    print("3. Show Balance")
+    print("4. Show Transactions")
+    print("5. Exit")
+    print("\n======================================")
+   
+def main():
+    """
+    Main function to control the program flow.
+    """
+    while True:
+        show_menu()
+
+        choice = input("Enter your choice (1-5): ").strip()
+
+        if choice == "1":
+            deposit_money()
+
+        elif choice == "2":
+            withdraw_money()
+
+        elif choice == "3":
+            show_balance()
+        
+        elif choice == "4":
+            show_transactions()
+
+        elif choice == "5":
+            print("Thank you for using Personal Finance Tracker. Goodbye!")
+            break # exit the while loop and program ends
+
+        else:
+            print("Invalid choice. Please enter a number between 1 and 5.")
+        
+def withdraw_money():
+    """
+    Handles withdrawing money from the account.
+    Ensures balance safety and logs transaction details.
+    """
+    global balance
+
+    print("\n--- Withdraw Money ---")
+
+    amount = get_valid_amount()
+
+    if amount > balance:
+        print("You can't withdraw more money than available in your account.")
+        return # stop this function safely 
+
+    reason = input("Enter reason for withdrawal: ").strip()
+    if not reason:
+        print("Reason required")
+        return
+
+    balance -= amount
+
+    create_transaction("withdraw", amount, reason, balance)
+
+    print(f"Withdrawal successful! Current balance: ₹{balance:.2f}")
+        
+def deposit_money():
+    """
+    Handles deposit money into the account.
+    Ensures balance safety and logs transaction details.
+    """        
+    global balance
+
+    print("\n--- Deposit Money  ---")
+
+    amount = get_valid_amount()
+
+    reason = input("Enter reason for deposit: ").strip()
+    if not reason:
+        print("Reason required")
+        return
+    
+    balance += amount
+
+    create_transaction("deposit", amount, reason, balance)
+    
+    print(f"Deposit successful! Current balance: ₹{balance:.2f}")
