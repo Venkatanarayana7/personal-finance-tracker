@@ -5,18 +5,16 @@
 3. Purpose : to improve the core logic and to be ensure code with better error hadling and with clear comments to explain and to be ensure code to helps for future file handling
 
 """
-BASE_WIDTH = 80
+BASE_WIDTH = 120
 balance = 0
 transactions = [] 
+AUTHOR_NAME = "Guvvala Venkata Narayana"
+PROJECT_NAME = "Personal Finance Tracker"
+VERSION = "v2.0"
+YEAR = "2025"
 def center_text(text, width):
     return text.center(width)
 
-def show_welcome_banner(width):
-    print("\n" + "=" * width)
-    print(center_text("🏦 RGUKT BANK 🏦", width))
-    print(center_text("Trusted Bank for Every IIIT Student", width))
-    print(center_text("Secure • Simple • Student-Friendly", width))
-    print("=" * width + "\n")
 
 def show_section_title(title, width):
     print("\n" + f" {title} ".center(width, "-"))
@@ -77,12 +75,27 @@ def show_menu():
     print(center_text("5. 🚪 Exit", BASE_WIDTH))
     print("".center(BASE_WIDTH, "="))
 
+def show_app_header(width):
+    print("\n" + "=" * width)
+    print(center_text("🏦 RGUKT BANK 🏦", width))
+    print(center_text(PROJECT_NAME, width))
+    print(center_text(f"Version: {VERSION}", width))
+    print(center_text("Secure • Simple • Student-Friendly", width))
+    print(center_text(f"Developed by {AUTHOR_NAME}", width))
+    print("=" * width + "\n")
+
+def show_exit_footer(width):
+    print("\n" + "-" * width)
+    print(center_text("Thank you for using Personal Finance Tracker", width))
+    print(center_text("Built with Python • Learning by Building", width))
+    print(center_text(f"© {YEAR} {AUTHOR_NAME}", width))
+    print("-" * width + "\n")
 
 def main():
     """
     Main function to control the program flow.
     """
-    show_welcome_banner(BASE_WIDTH)
+    show_app_header(BASE_WIDTH)
     while True:
         show_menu()
 
@@ -101,7 +114,7 @@ def main():
             print_transactions(transactions)
 
         elif choice == "5":
-            print("Thank you for using Personal Finance Tracker. Goodbye!")
+            show_exit_footer(BASE_WIDTH)
             break # exit the while loop and program ends
 
         else:
