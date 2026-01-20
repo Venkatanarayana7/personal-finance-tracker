@@ -1,0 +1,10 @@
+# Runtime data files
+balance.txt
+transactions.json
+transaction_report.txt
+
+# Generic ignores
+*.txt
+*.json
+__pycache__/
+*.pyc
