@@ -22,7 +22,7 @@ Built as part of learning Python fundamentals
 ## 🚀 How to Run
 
 1. Make sure Python 3.x is installed
-2. Download `finance_tracker_v3.py`
+2. Download `personal_finance_tracker.py`
 3. Open terminal/command prompt
 4. Navigate to folder: `cd path/to/folder`
 5. Run:
